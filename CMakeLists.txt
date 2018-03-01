@@ -12,14 +12,20 @@ find_package(Boost REQUIRED COMPONENTS system thread)
 
 catkin_package(
     INCLUDE_DIRS include
+    LIBRARIES async_comm
     CATKIN_DEPENDS roscpp
     DEPENDS Boost)
 
 include_directories(
     include
+
     ${catkin_INCLUDE_DIRS}
     ${Boost_INCLUDE_DIRS}
     )
+
+add_library(async_comm
+    async_comm/src/serial.cpp
+    async_comm/src/comm.cpp)
 
 add_executable(gimbal_serializer
     src/gimbal_serializer.cpp

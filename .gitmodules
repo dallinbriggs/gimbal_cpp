@@ -1,3 +1,0 @@
-[submodule "async_comm"]
-	path = async_comm
-	url = git@github.com:dpkoch/async_comm.git
