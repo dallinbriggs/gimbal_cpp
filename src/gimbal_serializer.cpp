@@ -3,7 +3,8 @@
 namespace gimbal_serializer{
 
 
-GimbalSerializer::GimbalSerializer()
+GimbalSerializer::GimbalSerializer():
+    nh_(ros::NodeHandle())
 {
 
 }
@@ -13,6 +14,7 @@ GimbalSerializer::GimbalSerializer()
 int main(int argc, char** argv)
 {
     ros::init(argc, argv, "gimbal_serial_node");
-    gimbal_serializer::GimbalSerializer object; //TODO
+    gimbal_serializer::GimbalSerializer gimbal_serial_node;
+    ros::spin();
     return 0;
 }
