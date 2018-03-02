@@ -35,6 +35,7 @@ add_dependencies(gimbal_serializer ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_
 target_link_libraries(gimbal_serializer
     ${catkin_LIBRARIES}
     ${BOOST_LIBRARIES}
+    async_comm
     )
 
 
