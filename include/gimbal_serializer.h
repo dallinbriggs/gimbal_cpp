@@ -36,7 +36,7 @@ private:
 
     // Callbacks and functions
     void command_callback(const geometry_msgs::Vector3StampedConstPtr &msg);
-    void serialize_msg(float x, float y, float z);
+    void serialize_msg();
     void init_serial();
     void serial_receive(uint8_t byte);
 

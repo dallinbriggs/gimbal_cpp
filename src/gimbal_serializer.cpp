@@ -22,16 +22,20 @@ GimbalSerializer::GimbalSerializer():
 
 void GimbalSerializer::command_callback(const geometry_msgs::Vector3StampedConstPtr &msg)
 {
-    //    command_echo.publish(msg);
     x_command = msg->vector.x;
     y_command = msg->vector.y;
     z_command = msg->vector.z;
-    serialize_msg(x_command, y_command, z_command);
+    serialize_msg();
 }
 
-void GimbalSerializer::serialize_msg(float x, float y, float z)
+void GimbalSerializer::serialize_msg()
 {
-
+    uint8_t buff[14];
+    buff[0] = 0xA5;
+    memcpy(buff+1, &x_command, sizeof(float));
+    memcpy(buff+5, &y_command, sizeof(float));
+    memcpy(buff+9, &z_command, sizeof(float));
+    serial_->send_bytes(buff, 14);
 }
 
 void GimbalSerializer::init_serial()
