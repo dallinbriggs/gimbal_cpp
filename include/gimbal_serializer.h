@@ -7,7 +7,13 @@
 
 #include "async_comm/serial.h"
 
-#define NUM_BYTES 8
+#define SERIAL_NUM_BYTES 8
+#define SERIAL_CRC_LENGTH 1
+#define SERIAL_CRC_INITIAL_VALUE 0x00
+
+#define SERIAL_OUT_START_BYTE 0xA5
+#define SERIAL_OUT_PAYLOAD_LENGTH 12
+#define SERIAL_OUT_MSG_LENGTH 14
 
 namespace gimbal_serializer
 {
@@ -29,6 +35,7 @@ private:
     float x_command;
     float y_command;
     float z_command;
+    uint8_t in_crc_value;
 
     // Params
     std::string port_;
@@ -39,6 +46,7 @@ private:
     void serialize_msg();
     void init_serial();
     void serial_receive(uint8_t byte);
+    uint8_t crc8_ccit_update(uint8_t inCrc, uint8_t inData);
 
     // Serialization
     async_comm::Serial *serial_;

@@ -30,12 +30,20 @@ void GimbalSerializer::command_callback(const geometry_msgs::Vector3StampedConst
 
 void GimbalSerializer::serialize_msg()
 {
-    uint8_t buff[14];
-    buff[0] = 0xA5;
-    memcpy(buff+1, &x_command, sizeof(float));
-    memcpy(buff+5, &y_command, sizeof(float));
-    memcpy(buff+9, &z_command, sizeof(float));
-    serial_->send_bytes(buff, 14);
+    uint8_t buf[SERIAL_OUT_MSG_LENGTH];
+    buf[0] = SERIAL_OUT_START_BYTE;
+
+    memcpy(buf+1, &x_command, sizeof(float));
+    memcpy(buf+5, &y_command, sizeof(float));
+    memcpy(buf+9, &z_command, sizeof(float));
+
+    uint8_t crc_value = SERIAL_CRC_INITIAL_VALUE;
+    for (int i = 0; i < SERIAL_OUT_MSG_LENGTH - SERIAL_CRC_LENGTH; i++)
+    {
+        crc_value = crc8_ccit_update(crc_value, buf[i]);
+    }
+    buf[SERIAL_OUT_MSG_LENGTH - 1] = crc_value;
+    serial_->send_bytes(buf, 14);
 }
 
 void GimbalSerializer::init_serial()
@@ -47,6 +55,29 @@ void GimbalSerializer::init_serial()
     {
         std::printf("Failed to initialize serial port\n");
     }
+}
+
+uint8_t GimbalSerializer::crc8_ccit_update(uint8_t inCrc, uint8_t inData)
+{
+    uint8_t   i;
+    uint8_t   data;
+
+    data = inCrc ^ inData;
+
+    for ( i = 0; i < 12; i++ )
+    {
+        if (( data & 0x80 ) != 0 )
+        {
+            data <<= 1;
+            data ^= 0x07;
+        }
+        else
+        {
+            data <<= 1;
+        }
+    }
+    return data;
+
 }
 
 void GimbalSerializer::serial_receive(uint8_t byte)
