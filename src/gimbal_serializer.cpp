@@ -42,7 +42,7 @@ void GimbalSerializer::serialize_msg()
         crc_value = crc8_ccit_update(crc_value, buf[i]);
     }
     buf[SERIAL_OUT_MSG_LENGTH - 1] = crc_value;
-    serial_->send_bytes(buf, SERIAL_OUT_PAYLOAD_LENGTH);
+    serial_->send_bytes(buf, SERIAL_OUT_MSG_LENGTH);
 }
 
 void GimbalSerializer::init_serial()
