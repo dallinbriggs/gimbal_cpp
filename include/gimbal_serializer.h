@@ -7,7 +7,6 @@
 
 #include "async_comm/serial.h"
 
-#define SERIAL_NUM_BYTES 8
 #define SERIAL_CRC_LENGTH 1
 #define SERIAL_CRC_INITIAL_VALUE 0x00
 

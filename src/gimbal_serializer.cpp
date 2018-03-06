@@ -14,7 +14,6 @@ GimbalSerializer::GimbalSerializer():
     // Initialize serial stuff
     init_serial();
 
-
     // Setup ros subscribers and publishers
     command_sub = nh_.subscribe("gimbal/command", 1, &GimbalSerializer::command_callback, this);
     command_echo = nh_.advertise<geometry_msgs::Vector3Stamped>("gimbal/current", 1);
@@ -43,7 +42,7 @@ void GimbalSerializer::serialize_msg()
         crc_value = crc8_ccit_update(crc_value, buf[i]);
     }
     buf[SERIAL_OUT_MSG_LENGTH - 1] = crc_value;
-    serial_->send_bytes(buf, 14);
+    serial_->send_bytes(buf, SERIAL_OUT_PAYLOAD_LENGTH);
 }
 
 void GimbalSerializer::init_serial()
@@ -64,7 +63,7 @@ uint8_t GimbalSerializer::crc8_ccit_update(uint8_t inCrc, uint8_t inData)
 
     data = inCrc ^ inData;
 
-    for ( i = 0; i < 12; i++ )
+    for ( i = 0; i < SERIAL_OUT_PAYLOAD_LENGTH; i++ )
     {
         if (( data & 0x80 ) != 0 )
         {
@@ -84,7 +83,6 @@ void GimbalSerializer::serial_receive(uint8_t byte)
 {
     // This is where you define how to handle a received byte.
 }
-
 
 } //end gimbal_serializer namespace
 
