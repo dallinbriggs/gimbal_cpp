@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <package format="2">
-  <name>gimbal_cpp</name>
+  <name>gimbal_serializer</name>
   <version>0.0.0</version>
-  <description>The gimbal_cpp package</description>
+  <description>The gimbal_serializer package</description>
   <maintainer email="dallinbriggs@gmail.com">Dallin Briggs</maintainer>
 
 

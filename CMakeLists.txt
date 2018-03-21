@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(gimbal_cpp)
+project(gimbal_serializer)
 set(CMAKE_CXX_FLAGS "-std=c++11")
 
 
@@ -39,4 +39,4 @@ target_link_libraries(gimbal_serializer
     )
 
 
-# install(TARGETS gimbal_cpp gimbal_serializer)
+# install(TARGETS gimbal_serializer gimbal_serializer)
