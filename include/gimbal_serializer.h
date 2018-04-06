@@ -6,6 +6,7 @@
 #include <functional>
 
 #include "async_comm/serial.h"
+#include "gimbal_serializer/status.h"
 
 #define SERIAL_CRC_LENGTH 1
 #define SERIAL_CRC_INITIAL_VALUE 0x00
@@ -13,6 +14,10 @@
 #define SERIAL_OUT_START_BYTE 0xA5
 #define SERIAL_OUT_PAYLOAD_LENGTH 12
 #define SERIAL_OUT_MSG_LENGTH 14
+
+#define SERIAL_IN_START_BYTE 0xA5
+#define SERIAL_IN_PAYLOAD_LENGTH 16
+#define SERIAL_IN_MSG_LENGTH 18
 
 namespace gimbal_serializer
 {
@@ -35,6 +40,7 @@ private:
     float y_command;
     float z_command;
     uint8_t in_crc_value;
+    uint8_t out_crc_value;
 
     // Params
     std::string port_;
@@ -44,8 +50,10 @@ private:
     void command_callback(const geometry_msgs::Vector3StampedConstPtr &msg);
     void serialize_msg();
     void init_serial();
-    void serial_receive(uint8_t byte);
-    uint8_t crc8_ccit_update(uint8_t inCrc, uint8_t inData);
+    void rx_callback(uint8_t byte);
+    uint8_t out_crc8_ccit_update(uint8_t outCrc, uint8_t outData);
+    uint8_t in_crc8_ccit_update(uint8_t inCrc, uint8_t inData);
+    bool parse_in_byte(uint8_t c);
 
     // Serialization
     async_comm::Serial *serial_;

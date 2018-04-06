@@ -7,9 +7,19 @@ find_package(catkin REQUIRED COMPONENTS
     geometry_msgs
     roscpp
     std_msgs
+    message_generation
     )
 
 find_package(Boost REQUIRED COMPONENTS system thread)
+
+add_message_files(FILES
+    status.msg
+    )
+
+generate_messages(DEPENDENCIES
+    std_msgs
+    geometry_msgs
+    )
 
 catkin_package(
     INCLUDE_DIRS include
