@@ -19,6 +19,7 @@
 #define SERIAL_IN_PAYLOAD_LENGTH 16
 #define SERIAL_IN_MSG_LENGTH 18
 
+
 namespace gimbal_serializer
 {
 
@@ -42,17 +43,29 @@ private:
     uint8_t in_crc_value;
     uint8_t out_crc_value;
 
+    int in_payload_index;
+    uint8_t in_payload_buf[SERIAL_IN_PAYLOAD_LENGTH];
+    int crc_error_count;
+
     // Params
     std::string port_;
     int baudrate_;
+
+    enum ParseState {
+        PARSE_STATE_IDLE,
+        PARSE_STATE_GOT_START_BYTE,
+        PARSE_STATE_GOT_PAYLOAD
+    };
+
+    ParseState parse_state;
 
     // Callbacks and functions
     void command_callback(const geometry_msgs::Vector3StampedConstPtr &msg);
     void serialize_msg();
     void init_serial();
     void rx_callback(uint8_t byte);
-    uint8_t out_crc8_ccit_update(uint8_t outCrc, uint8_t outData);
-    uint8_t in_crc8_ccit_update(uint8_t inCrc, uint8_t inData);
+    uint8_t out_crc8_ccitt_update(uint8_t outCrc, uint8_t outData);
+    uint8_t in_crc8_ccitt_update(uint8_t inCrc, uint8_t inData);
     bool parse_in_byte(uint8_t c);
 
     // Serialization

@@ -17,6 +17,8 @@ GimbalSerializer::GimbalSerializer():
     // Setup ros subscribers and publishers
     command_sub = nh_.subscribe("gimbal/control", 1, &GimbalSerializer::command_callback, this);
     command_echo = nh_.advertise<gimbal_serializer::status>("gimbal/status", 1);
+    parse_state = PARSE_STATE_IDLE;
+    crc_error_count = 0;
 }
 
 void GimbalSerializer::command_callback(const geometry_msgs::Vector3StampedConstPtr &msg)
@@ -39,7 +41,7 @@ void GimbalSerializer::serialize_msg()
     uint8_t crc_value = SERIAL_CRC_INITIAL_VALUE;
     for (int i = 0; i < SERIAL_OUT_MSG_LENGTH - SERIAL_CRC_LENGTH; i++)
     {
-        crc_value = out_crc8_ccit_update(crc_value, buf[i]);
+        crc_value = out_crc8_ccitt_update(crc_value, buf[i]);
     }
     buf[SERIAL_OUT_MSG_LENGTH - 1] = crc_value;
     serial_->send_bytes(buf, SERIAL_OUT_MSG_LENGTH);
@@ -56,7 +58,7 @@ void GimbalSerializer::init_serial()
     }
 }
 
-uint8_t GimbalSerializer::out_crc8_ccit_update(uint8_t outCrc, uint8_t outData)
+uint8_t GimbalSerializer::out_crc8_ccitt_update(uint8_t outCrc, uint8_t outData)
 {
     uint8_t   i;
     uint8_t   data;
@@ -79,7 +81,7 @@ uint8_t GimbalSerializer::out_crc8_ccit_update(uint8_t outCrc, uint8_t outData)
 
 }
 
-uint8_t GimbalSerializer::in_crc8_ccit_update(uint8_t inCrc, uint8_t inData)
+uint8_t GimbalSerializer::in_crc8_ccitt_update(uint8_t inCrc, uint8_t inData)
 {
     uint8_t   i;
     uint8_t   data;
@@ -113,15 +115,15 @@ void GimbalSerializer::rx_callback(uint8_t byte)
 //==================================================================
 // handle an incoming byte
 //==================================================================
-bool parse_in_byte(uint8_t c)
+bool GimbalSerializer::parse_in_byte(uint8_t c)
 {
     bool got_message = false;
     switch (parse_state)
     {
     case PARSE_STATE_IDLE:
-        if (c == IN_START_BYTE)
+        if (c == SERIAL_IN_START_BYTE)
         {
-            in_crc_value = CRC_INITIAL_VALUE;
+            in_crc_value = SERIAL_CRC_INITIAL_VALUE;
             in_crc_value = in_crc8_ccitt_update(in_crc_value, c);
 
             in_payload_index = 0;
@@ -132,7 +134,7 @@ bool parse_in_byte(uint8_t c)
     case PARSE_STATE_GOT_START_BYTE:
         in_crc_value = in_crc8_ccitt_update(in_crc_value, c);
         in_payload_buf[in_payload_index++] = c;
-        if (in_payload_index == IN_PAYLOAD_LENGTH)
+        if (in_payload_index == SERIAL_IN_PAYLOAD_LENGTH)
         {
             parse_state = PARSE_STATE_GOT_PAYLOAD;
         }
@@ -142,7 +144,6 @@ bool parse_in_byte(uint8_t c)
         if (c == in_crc_value)
         {
             got_message = true;
-            blink_led();
         }
         else
         {
