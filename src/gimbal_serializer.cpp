@@ -104,11 +104,17 @@ uint8_t GimbalSerializer::in_crc8_ccitt_update(uint8_t inCrc, uint8_t inData)
 
 }
 
+void GimbalSerializer::unpack_in_payload(uint8_t buf[], float *roll, float *pitch, float *yaw)
+{
+
+}
+
 void GimbalSerializer::rx_callback(uint8_t byte)
 {
     if (parse_in_byte(byte))
     {
-
+        float roll, pitch, yaw;
+        unpack_in_payload(in_payload_buf, &roll, &pitch, &yaw);
     }
 }
 

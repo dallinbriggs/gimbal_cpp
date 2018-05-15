@@ -67,6 +67,7 @@ private:
     uint8_t out_crc8_ccitt_update(uint8_t outCrc, uint8_t outData);
     uint8_t in_crc8_ccitt_update(uint8_t inCrc, uint8_t inData);
     bool parse_in_byte(uint8_t c);
+    void unpack_in_payload(uint8_t buf[SERIAL_IN_PAYLOAD_LENGTH], float *roll, float *pitch, float *yaw);
 
     // Serialization
     async_comm::Serial *serial_;
