@@ -4,4 +4,4 @@
 *.creator
 *.includes
 *.files
-
+*.user.*

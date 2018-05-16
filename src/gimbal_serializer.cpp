@@ -16,7 +16,7 @@ GimbalSerializer::GimbalSerializer():
 
     // Setup ros subscribers and publishers
     command_sub = nh_.subscribe("gimbal/control", 1, &GimbalSerializer::command_callback, this);
-    command_echo = nh_.advertise<gimbal_serializer::status>("gimbal/status", 1);
+    command_echo_pub = nh_.advertise<gimbal_serializer::status>("gimbal/status", 1);
     parse_state = PARSE_STATE_IDLE;
     crc_error_count = 0;
 }
@@ -104,9 +104,12 @@ uint8_t GimbalSerializer::in_crc8_ccitt_update(uint8_t inCrc, uint8_t inData)
 
 }
 
-void GimbalSerializer::unpack_in_payload(uint8_t buf[], float *roll, float *pitch, float *yaw)
+void GimbalSerializer::unpack_in_payload(uint8_t buf[], int *error_count, float *roll, float *pitch, float *yaw)
 {
-
+    memcpy(error_count, buf, 4);
+    memcpy(roll, buf + 4, 4);
+    memcpy(pitch, buf + 8, 4);
+    memcpy(yaw, buf + 12, 4);
 }
 
 void GimbalSerializer::rx_callback(uint8_t byte)
@@ -114,7 +117,14 @@ void GimbalSerializer::rx_callback(uint8_t byte)
     if (parse_in_byte(byte))
     {
         float roll, pitch, yaw;
-        unpack_in_payload(in_payload_buf, &roll, &pitch, &yaw);
+        int error_count;
+        unpack_in_payload(in_payload_buf, &error_count, &roll, &pitch, &yaw);
+        gimbal_serializer::status msg;
+        msg.crc_error_count = error_count;
+        msg.roll_command = roll;
+        msg.pitch_command = pitch;
+        msg.yaw_command = yaw;
+        command_echo_pub.publish(msg);
     }
 }
 
