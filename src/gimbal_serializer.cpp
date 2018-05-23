@@ -104,12 +104,13 @@ uint8_t GimbalSerializer::in_crc8_ccitt_update(uint8_t inCrc, uint8_t inData)
 
 }
 
-void GimbalSerializer::unpack_in_payload(uint8_t buf[], int *error_count, float *roll, float *pitch, float *yaw)
+void GimbalSerializer::unpack_in_payload(uint8_t buf[], float *command_frequency, float *servo_frequency, float *roll, float *pitch, float *yaw)
 {
-    memcpy(error_count, buf, 4);
-    memcpy(roll, buf + 4, 4);
-    memcpy(pitch, buf + 8, 4);
-    memcpy(yaw, buf + 12, 4);
+    memcpy(command_frequency, buf, 4);
+    memcpy(servo_frequency, buf + 4, 4);
+    memcpy(roll, buf + 8, 4);
+    memcpy(pitch, buf + 12, 4);
+    memcpy(yaw, buf + 16, 4);
 }
 
 void GimbalSerializer::rx_callback(uint8_t byte)
@@ -117,10 +118,12 @@ void GimbalSerializer::rx_callback(uint8_t byte)
     if (parse_in_byte(byte))
     {
         float roll, pitch, yaw;
-        int error_count;
-        unpack_in_payload(in_payload_buf, &error_count, &roll, &pitch, &yaw);
+        float command_hz;
+        float servo_hz;
+        unpack_in_payload(in_payload_buf, &command_hz, &servo_hz, &roll, &pitch, &yaw);
         gimbal_serializer::status msg;
-        msg.crc_error_count = error_count;
+        msg.command_in_Hz = command_hz;
+        msg.servo_command_Hz;
         msg.roll_command = roll;
         msg.pitch_command = pitch;
         msg.yaw_command = yaw;
