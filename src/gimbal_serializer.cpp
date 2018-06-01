@@ -123,7 +123,7 @@ void GimbalSerializer::rx_callback(uint8_t byte)
         unpack_in_payload(in_payload_buf, &command_hz, &servo_hz, &roll, &pitch, &yaw);
         gimbal_serializer::status msg;
         msg.command_in_Hz = command_hz;
-        msg.servo_command_Hz;
+        msg.servo_command_Hz = servo_hz;
         msg.roll_command = roll;
         msg.pitch_command = pitch;
         msg.yaw_command = yaw;
