@@ -127,6 +127,7 @@ void GimbalSerializer::rx_callback(uint8_t byte)
         msg.roll_command = roll;
         msg.pitch_command = pitch;
         msg.yaw_command = yaw;
+        msg.header.stamp = ros::Time::now();
         command_echo_pub.publish(msg);
     }
 }
