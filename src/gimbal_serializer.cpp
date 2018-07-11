@@ -10,7 +10,7 @@ GimbalSerializer::GimbalSerializer():
     // Set/get params
     nh_private_.param<std::string>("port", port_, "/dev/gimbal");
     nh_private_.param<int>("baudrate", baudrate_, 115200);
-    nh_private_.param<int>("channel", rc_channel_, 7);
+    nh_private_.param<int>("rc_channel", rc_channel_, 7);
     nh_private_.param<float>("retract_up_angle", retract_up_angle_, 0);
     nh_private_.param<float>("retract_down_angle", retract_down_angle_, 1.57);
 
