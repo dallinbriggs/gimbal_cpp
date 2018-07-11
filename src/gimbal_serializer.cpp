@@ -10,6 +10,9 @@ GimbalSerializer::GimbalSerializer():
     // Set/get params
     nh_private_.param<std::string>("port", port_, "/dev/gimbal");
     nh_private_.param<int>("baudrate", baudrate_, 115200);
+    nh_private_.param<int>("channel", rc_channel_, 7);
+    nh_private_.param<float>("retract_up_angle", retract_up_angle_, 0);
+    nh_private_.param<float>("retract_down_angle", retract_down_angle_, 1.57);
 
     // Initialize serial stuff
     init_serial();
@@ -27,12 +30,24 @@ void GimbalSerializer::command_callback(const geometry_msgs::Vector3StampedConst
     x_command = msg->vector.x;
     y_command = msg->vector.y;
     z_command = msg->vector.z;
+    retract_command = retract_down_angle_;
+    if (retract_rc_in > 1500)
+    {
+        x_command = 0;
+        y_command = 0;
+        z_command = 0;
+        retract_command = retract_down_angle_;
+        sleep(1);
+        serialize_msg();
+        retract_command = retract_up_angle_;
+        serialize_msg();
+    }
     serialize_msg();
 }
 
 void GimbalSerializer::retract_callback(const mavros_msgs::RCInConstPtr &msg)
 {
-
+    retract_rc_in = msg->channels[rc_channel_];
 }
 
 void GimbalSerializer::serialize_msg()
@@ -43,6 +58,7 @@ void GimbalSerializer::serialize_msg()
     memcpy(buf+1, &x_command, sizeof(float));
     memcpy(buf+5, &y_command, sizeof(float));
     memcpy(buf+9, &z_command, sizeof(float));
+    memcpy(buf+13, &retract_command, sizeof(float));
 
     uint8_t crc_value = SERIAL_CRC_INITIAL_VALUE;
     for (int i = 0; i < SERIAL_OUT_MSG_LENGTH - SERIAL_CRC_LENGTH; i++)

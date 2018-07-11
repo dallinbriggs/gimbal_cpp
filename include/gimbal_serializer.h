@@ -5,6 +5,7 @@
 #include <geometry_msgs/Vector3Stamped.h>
 #include <functional>
 #include <mavros_msgs/RCIn.h>
+#include <unistd.h>
 
 #include "async_comm/serial.h"
 #include "gimbal_serializer/status.h"
@@ -43,6 +44,7 @@ private:
     float y_command;
     float z_command;
     float retract_command;
+    int retract_rc_in;
     uint8_t in_crc_value;
     uint8_t out_crc_value;
 
@@ -53,6 +55,9 @@ private:
     // Params
     std::string port_;
     int baudrate_;
+    int rc_channel_;
+    float retract_up_angle_;
+    float retract_down_angle_;
 
     enum ParseState {
         PARSE_STATE_IDLE,
