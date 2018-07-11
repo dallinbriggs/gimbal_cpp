@@ -16,6 +16,7 @@ GimbalSerializer::GimbalSerializer():
 
     // Setup ros subscribers and publishers
     command_sub = nh_.subscribe("gimbal/control", 1, &GimbalSerializer::command_callback, this);
+    retract_sub = nh_.subscribe("mavros/rc/in", 1, &GimbalSerializer::retract_callback, this);
     command_echo_pub = nh_.advertise<gimbal_serializer::status>("gimbal/status", 1);
     parse_state = PARSE_STATE_IDLE;
     crc_error_count = 0;
@@ -27,6 +28,11 @@ void GimbalSerializer::command_callback(const geometry_msgs::Vector3StampedConst
     y_command = msg->vector.y;
     z_command = msg->vector.z;
     serialize_msg();
+}
+
+void GimbalSerializer::retract_callback(const mavros_msgs::RCInConstPtr &msg)
+{
+
 }
 
 void GimbalSerializer::serialize_msg()
@@ -104,23 +110,24 @@ uint8_t GimbalSerializer::in_crc8_ccitt_update(uint8_t inCrc, uint8_t inData)
 
 }
 
-void GimbalSerializer::unpack_in_payload(uint8_t buf[], float *command_frequency, float *servo_frequency, float *roll, float *pitch, float *yaw)
+void GimbalSerializer::unpack_in_payload(uint8_t buf[], float *command_frequency, float *servo_frequency, float *roll, float *pitch, float *yaw, float *retract)
 {
     memcpy(command_frequency, buf, 4);
     memcpy(servo_frequency, buf + 4, 4);
     memcpy(roll, buf + 8, 4);
     memcpy(pitch, buf + 12, 4);
     memcpy(yaw, buf + 16, 4);
+    memcpy(retract, buf + 20, 4);
 }
 
 void GimbalSerializer::rx_callback(uint8_t byte)
 {
     if (parse_in_byte(byte))
     {
-        float roll, pitch, yaw;
+        float roll, pitch, yaw, retract;
         float command_hz;
         float servo_hz;
-        unpack_in_payload(in_payload_buf, &command_hz, &servo_hz, &roll, &pitch, &yaw);
+        unpack_in_payload(in_payload_buf, &command_hz, &servo_hz, &roll, &pitch, &yaw, &retract);
         gimbal_serializer::status msg;
         msg.command_in_Hz = command_hz;
         msg.servo_command_Hz = servo_hz;
