@@ -10,9 +10,7 @@ GimbalSerializer::GimbalSerializer():
     // Set/get params
     nh_private_.param<std::string>("port", port_, "/dev/gimbal");
     nh_private_.param<int>("baudrate", baudrate_, 115200);
-    nh_private_.param<int>("channel", rc_channel_, 7);
-    nh_private_.param<float>("retract_up_angle", retract_up_angle_, 0);
-    nh_private_.param<float>("retract_down_angle", retract_down_angle_, 1.57);
+    nh_private_.param<int>("channel", rc_channel_, 6);
 
     // Initialize serial stuff
     init_serial();
@@ -30,17 +28,11 @@ void GimbalSerializer::command_callback(const geometry_msgs::Vector3StampedConst
     x_command = msg->vector.x;
     y_command = msg->vector.y;
     z_command = msg->vector.z;
-    retract_command = retract_down_angle_;
     if (retract_rc_in > 1500)
     {
-        x_command = 0;
+        x_command = 4000;
         y_command = 0;
         z_command = 0;
-        retract_command = retract_down_angle_;
-        sleep(1);
-        serialize_msg();
-        retract_command = retract_up_angle_;
-        serialize_msg();
     }
     serialize_msg();
 }
@@ -58,7 +50,6 @@ void GimbalSerializer::serialize_msg()
     memcpy(buf+1, &x_command, sizeof(float));
     memcpy(buf+5, &y_command, sizeof(float));
     memcpy(buf+9, &z_command, sizeof(float));
-    memcpy(buf+13, &retract_command, sizeof(float));
 
     uint8_t crc_value = SERIAL_CRC_INITIAL_VALUE;
     for (int i = 0; i < SERIAL_OUT_MSG_LENGTH - SERIAL_CRC_LENGTH; i++)
@@ -126,24 +117,23 @@ uint8_t GimbalSerializer::in_crc8_ccitt_update(uint8_t inCrc, uint8_t inData)
 
 }
 
-void GimbalSerializer::unpack_in_payload(uint8_t buf[], float *command_frequency, float *servo_frequency, float *roll, float *pitch, float *yaw, float *retract)
+void GimbalSerializer::unpack_in_payload(uint8_t buf[], float *command_frequency, float *servo_frequency, float *roll, float *pitch, float *yaw)
 {
     memcpy(command_frequency, buf, 4);
     memcpy(servo_frequency, buf + 4, 4);
     memcpy(roll, buf + 8, 4);
     memcpy(pitch, buf + 12, 4);
     memcpy(yaw, buf + 16, 4);
-    memcpy(retract, buf + 20, 4);
 }
 
 void GimbalSerializer::rx_callback(uint8_t byte)
 {
     if (parse_in_byte(byte))
     {
-        float roll, pitch, yaw, retract;
+        float roll, pitch, yaw;
         float command_hz;
         float servo_hz;
-        unpack_in_payload(in_payload_buf, &command_hz, &servo_hz, &roll, &pitch, &yaw, &retract);
+        unpack_in_payload(in_payload_buf, &command_hz, &servo_hz, &roll, &pitch, &yaw);
         gimbal_serializer::status msg;
         msg.command_in_Hz = command_hz;
         msg.servo_command_Hz = servo_hz;

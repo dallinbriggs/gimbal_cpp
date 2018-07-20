@@ -14,12 +14,12 @@
 #define SERIAL_CRC_INITIAL_VALUE 0x00
 
 #define SERIAL_OUT_START_BYTE 0xA5
-#define SERIAL_OUT_PAYLOAD_LENGTH 16
-#define SERIAL_OUT_MSG_LENGTH 18
+#define SERIAL_OUT_PAYLOAD_LENGTH 12
+#define SERIAL_OUT_MSG_LENGTH 14
 
 #define SERIAL_IN_START_BYTE 0xA5
-#define SERIAL_IN_PAYLOAD_LENGTH 24
-#define SERIAL_IN_MSG_LENGTH 26
+#define SERIAL_IN_PAYLOAD_LENGTH 20
+#define SERIAL_IN_MSG_LENGTH 22
 
 
 namespace gimbal_serializer
@@ -75,7 +75,7 @@ private:
     uint8_t out_crc8_ccitt_update(uint8_t outCrc, uint8_t outData);
     uint8_t in_crc8_ccitt_update(uint8_t inCrc, uint8_t inData);
     bool parse_in_byte(uint8_t c);
-    void unpack_in_payload(uint8_t buf[SERIAL_IN_PAYLOAD_LENGTH], float *command_frequency, float *servo_frequency, float *roll, float *pitch, float *yaw, float *retract);
+    void unpack_in_payload(uint8_t buf[SERIAL_IN_PAYLOAD_LENGTH], float *command_frequency, float *servo_frequency, float *roll, float *pitch, float *yaw);
     void retract_callback(const mavros_msgs::RCInConstPtr &msg);
 
     // Serialization
