@@ -4,4 +4,3 @@ float64 servo_command_Hz
 float64 roll_command
 float64 pitch_command
 float64 yaw_command
-float64 retract_command

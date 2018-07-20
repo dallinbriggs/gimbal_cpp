@@ -43,7 +43,6 @@ private:
     float x_command;
     float y_command;
     float z_command;
-    float retract_command;
     int retract_rc_in;
     uint8_t in_crc_value;
     uint8_t out_crc_value;
