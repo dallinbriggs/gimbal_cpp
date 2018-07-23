@@ -39,7 +39,10 @@ void GimbalSerializer::command_callback(const geometry_msgs::Vector3StampedConst
 
 void GimbalSerializer::retract_callback(const mavros_msgs::RCInConstPtr &msg)
 {
-    retract_rc_in = msg->channels[rc_channel_];
+    if (msg->channels.empty())
+      retract_rc_in = 0;
+    else
+      retract_rc_in = msg->channels[rc_channel_];
 }
 
 void GimbalSerializer::serialize_msg()
