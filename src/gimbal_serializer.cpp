@@ -10,7 +10,7 @@ GimbalSerializer::GimbalSerializer():
     // Set/get params
     nh_private_.param<std::string>("port", port_, "/dev/gimbal");
     nh_private_.param<int>("baudrate", baudrate_, 115200);
-    nh_private_.param<int>("channel", rc_channel_, 6);
+    nh_private_.param<int>("channel", rc_channel_, 5);
 
     // Initialize serial stuff
     init_serial();
@@ -199,6 +199,9 @@ int main(int argc, char** argv)
 {
     ros::init(argc, argv, "gimbal_serial_node");
     gimbal_serializer::GimbalSerializer gimbal_serial_node;
-    ros::spin();
+    while (ros::ok())
+    {
+    ros::spinOnce();
+    }
     return 0;
 }
