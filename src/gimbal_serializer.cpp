@@ -18,7 +18,7 @@ GimbalSerializer::GimbalSerializer():
     // Setup ros subscribers and publishers
     command_sub = nh_.subscribe("gimbal/control", 1, &GimbalSerializer::command_callback, this);
     retract_sub = nh_.subscribe("mavros/rc/in", 1, &GimbalSerializer::retract_callback, this);
-    command_echo_pub = nh_.advertise<gimbal_serializer::status>("gimbal/status", 1);
+//    command_echo_pub = nh_.advertise<gimbal_serializer::status>("gimbal/status", 1);
     parse_state = PARSE_STATE_IDLE;
     crc_error_count = 0;
 }
@@ -66,7 +66,7 @@ void GimbalSerializer::serialize_msg()
 void GimbalSerializer::init_serial()
 {
     serial_ = new async_comm::Serial(port_, (unsigned int)baudrate_);
-    serial_->register_receive_callback(std::bind(&GimbalSerializer::rx_callback, this, std::placeholders::_1));
+//    serial_->register_receive_callback(std::bind(&GimbalSerializer::rx_callback, this, std::placeholders::_1));
 
     if (!serial_->init())
     {
