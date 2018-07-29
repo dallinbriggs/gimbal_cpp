@@ -19,8 +19,7 @@ GimbalSerializer::GimbalSerializer():
     command_sub = nh_.subscribe("gimbal/control", 1, &GimbalSerializer::command_callback, this);
     retract_sub = nh_.subscribe("mavros/rc/in", 1, &GimbalSerializer::retract_callback, this);
 //    command_echo_pub = nh_.advertise<gimbal_serializer::status>("gimbal/status", 1);
-    parse_state = PARSE_STATE_IDLE;
-    crc_error_count = 0;
+//    parse_state = PARSE_STATE_IDLE;
 }
 
 void GimbalSerializer::command_callback(const geometry_msgs::Vector3StampedConstPtr &msg)
@@ -199,9 +198,6 @@ int main(int argc, char** argv)
 {
     ros::init(argc, argv, "gimbal_serial_node");
     gimbal_serializer::GimbalSerializer gimbal_serial_node;
-    while (ros::ok())
-    {
-    ros::spinOnce();
-    }
+    ros::spin();
     return 0;
 }

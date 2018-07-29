@@ -43,13 +43,13 @@ private:
     float x_command;
     float y_command;
     float z_command;
-    int retract_rc_in = 0;
+    int retract_rc_in {0};
     uint8_t in_crc_value;
     uint8_t out_crc_value;
 
     int in_payload_index;
     uint8_t in_payload_buf[SERIAL_IN_PAYLOAD_LENGTH];
-    int crc_error_count;
+    int crc_error_count {0};
 
     // Params
     std::string port_;
@@ -64,7 +64,7 @@ private:
         PARSE_STATE_GOT_PAYLOAD
     };
 
-    ParseState parse_state;
+    ParseState parse_state {PARSE_STATE_IDLE};
 
     // Callbacks and functions
     void command_callback(const geometry_msgs::Vector3StampedConstPtr &msg);
