@@ -24,9 +24,13 @@ GimbalSerializer::GimbalSerializer():
 
 void GimbalSerializer::command_callback(const geometry_msgs::Vector3StampedConstPtr &msg)
 {
-    x_command = msg->vector.x;
-    y_command = msg->vector.y;
-    z_command = msg->vector.z;
+    static float x_command_old = 0;
+    static float y_command_old = 0;
+    static float z_command_old = 0;
+    float alpha = .9;
+    x_command = (1-alpha)*msg->vector.x + alpha*x_command_old;
+    y_command = (1-alpha)*msg->vector.y + alpha*y_command_old;
+    z_command = (1-alpha)*msg->vector.z + alpha*z_command_old;
     if (retract_rc_in > 1500)
     {
         x_command = 4000;
@@ -34,6 +38,10 @@ void GimbalSerializer::command_callback(const geometry_msgs::Vector3StampedConst
         z_command = 0;
     }
     serialize_msg();
+
+    x_command_old = x_command;
+    y_command_old = y_command;
+    z_command_old = z_command;
 }
 
 void GimbalSerializer::retract_callback(const mavros_msgs::RCInConstPtr &msg)
