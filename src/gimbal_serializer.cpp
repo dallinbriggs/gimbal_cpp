@@ -27,7 +27,7 @@ void GimbalSerializer::command_callback(const geometry_msgs::Vector3StampedConst
     static float x_command_old = 0;
     static float y_command_old = 0;
     static float z_command_old = 0;
-    float alpha = .9;
+    float alpha = .6;
     x_command = (1-alpha)*msg->vector.x + alpha*x_command_old;
     y_command = (1-alpha)*msg->vector.y + alpha*y_command_old;
     z_command = (1-alpha)*msg->vector.z + alpha*z_command_old;
@@ -42,6 +42,7 @@ void GimbalSerializer::command_callback(const geometry_msgs::Vector3StampedConst
     x_command_old = x_command;
     y_command_old = y_command;
     z_command_old = z_command;
+    header_ = msg->header;
 }
 
 void GimbalSerializer::retract_callback(const mavros_msgs::RCInConstPtr &msg)
@@ -150,7 +151,8 @@ void GimbalSerializer::rx_callback(uint8_t byte)
         msg.roll_command = roll;
         msg.pitch_command = pitch;
         msg.yaw_command = yaw;
-        msg.header.stamp = ros::Time::now();
+        // msg.header.stamp = ros::Time::now();
+        msg.header = header_;
         command_echo_pub.publish(msg);
     }
 }

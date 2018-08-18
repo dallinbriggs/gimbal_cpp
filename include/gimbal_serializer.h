@@ -6,6 +6,7 @@
 #include <functional>
 #include <mavros_msgs/RCIn.h>
 #include <unistd.h>
+#include <std_msgs/Header.h>
 
 #include "async_comm/serial.h"
 #include "gimbal_serializer/status.h"
@@ -77,6 +78,9 @@ private:
     void unpack_in_payload(uint8_t buf[SERIAL_IN_PAYLOAD_LENGTH], float *command_frequency, float *servo_frequency, float *roll, float *pitch, float *yaw);
     void retract_callback(const mavros_msgs::RCInConstPtr &msg);
 
+    std_msgs::Header header_;
+
+
     // Serialization
     async_comm::Serial *serial_;
 
@@ -84,4 +88,3 @@ private:
 
 #endif // GIMBAL_SERIALIZER_H
 } //end namespace gimbal_serializer
-
